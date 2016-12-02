@@ -19,6 +19,7 @@ namespace Echo.Server
             
             if (buffer != null)
             {
+                var request = (MessageRequest)this.ByteArrayToObject(buffer.ToArray());
                 Console.WriteLine("Received from client: " + buffer.ToString(Encoding.UTF8));
             }            
             context.WriteAsync(message);
@@ -31,8 +32,8 @@ namespace Echo.Server
 
         public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
         {
-            Console.WriteLine("Exception: " + exception);
-            context.CloseAsync();
+          //  Console.WriteLine("Exception: " + exception);
+           // context.CloseAsync();
         }
 
         private Object ByteArrayToObject(byte[] arrBytes)

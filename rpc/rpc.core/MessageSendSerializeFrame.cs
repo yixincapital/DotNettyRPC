@@ -15,7 +15,7 @@ namespace rpc.core
             {
                 pipeline.AddLast(new LengthFieldPrepender(2));
                 pipeline.AddLast(new LengthFieldBasedFrameDecoder(ushort.MaxValue, 0, 2, 0, 2));
-                pipeline.AddLast(new MessageSendHandler());
+                pipeline.AddLast(new MessageSendHandler(protocol));
             } //TODO use pf or other protocal ,now use binary serializer as default  
 
             RpcServerLoader.Instance.SetMessageSendHandler(pipeline.Get<MessageSendHandler>());

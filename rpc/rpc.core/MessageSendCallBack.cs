@@ -32,7 +32,7 @@ namespace rpc.core
             finally
             {
                  //TODO  maybe some callback for caller
-                Console.WriteLine("locked response ");
+                //Console.WriteLine("locked response ");
             }
         }
 

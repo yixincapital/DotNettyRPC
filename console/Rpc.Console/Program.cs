@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Rpc.Console
 {
+    using System.Diagnostics;
     using System.Net;
     using System.Security.Cryptography.X509Certificates;
     using DotNetty.Codecs;
@@ -24,12 +25,15 @@ namespace Rpc.Console
         {
             var executor = new MessageSendExecutor("127.0.0.1", 8007, new DefaultSerializer());
             var myService = executor.Execute<IIntParameter>();
-            for (int i = 0; i < 100; i++)
+            var sw =new Stopwatch();
+            sw.Start();
+            for (int i = 0; i < 10000; i++)
             {
                 myService.Method(1);
             }
    
-           
+           sw.Stop();
+            Console.WriteLine("一万次调用耗时:{0}毫秒",sw.ElapsedMilliseconds);
         }
 
         static void Main(string[] args)

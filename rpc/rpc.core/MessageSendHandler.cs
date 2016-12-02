@@ -12,13 +12,15 @@ namespace rpc.core
 
     public class MessageSendHandler : ChannelHandlerAdapter
     {
-        readonly IByteBuffer requestMessage;
+        IByteBuffer requestMessage;
+        ISerializer serializer;
         readonly ConcurrentDictionary<string, MessageSendCallBack> callBackActions = new ConcurrentDictionary<string, MessageSendCallBack>();
         IChannelHandlerContext channelContext;      
-        public MessageSendHandler()
+        public MessageSendHandler(ISerializer serializer)
         {
-            this.requestMessage = Unpooled.Buffer(MessageSendSettings.Size);
+            this.serializer = serializer;
         }
+
         public override void ChannelRegistered(IChannelHandlerContext context)
         {
             base.ChannelRegistered(context);
@@ -31,7 +33,7 @@ namespace rpc.core
         }
 
         public override void ChannelRead(IChannelHandlerContext context, object message)
-        {
+        {            
             var byteBuffer = message as IByteBuffer;
             if (byteBuffer != null)
             {
@@ -55,11 +57,12 @@ namespace rpc.core
 
         public MessageSendCallBack SendRequest(MessageRequest request)
         {
+            this.requestMessage = Unpooled.Buffer(MessageSendSettings.Size);
             var callBack = new MessageSendCallBack(request);
-            this.callBackActions.TryAdd(request.MessageId, callBack);
-            byte[] messageBytes = Encoding.UTF8.GetBytes(request.MessageId);
-            this.requestMessage.WriteBytes(messageBytes);
+            this.callBackActions.TryAdd(request.MessageId, callBack);       
+            this.requestMessage.WriteBytes(this.serializer.Serialize(request));
             this.channelContext.WriteAndFlushAsync(this.requestMessage);
+            
             return callBack;
         }
     }
