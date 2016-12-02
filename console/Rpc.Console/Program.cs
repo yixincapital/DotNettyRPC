@@ -27,7 +27,7 @@ namespace Rpc.Console
             var myService = executor.Execute<IIntParameter>();
             var sw =new Stopwatch();
             sw.Start();
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 1; i++)
             {
                 myService.Method(1);
             }

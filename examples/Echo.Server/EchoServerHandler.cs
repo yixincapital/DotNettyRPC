@@ -4,25 +4,36 @@ namespace Echo.Server
 {
     using System;
     using System.IO;
+    using System.Runtime.Serialization;
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Text;
     using DotNetty.Buffers;
     using DotNetty.Transport.Channels;
     using rpc.model;
+    using rpc.serialize;
 
     public class EchoServerHandler : ChannelHandlerAdapter
     {
+        DefaultSerializer serializable;
+
+        public EchoServerHandler()
+        {
+            this.serializable = new DefaultSerializer();
+        }
         public override void ChannelRead(IChannelHandlerContext context, object message)
         {
           
             IByteBuffer buffer = message as SlicedByteBuffer;
-            
+            var response = new MessageResponse();
             if (buffer != null)
             {
-                var request = (MessageRequest)this.ByteArrayToObject(buffer.ToArray());
+                var request = (MessageRequest)this.serializable.Deserialize(buffer.ToArray());
                 Console.WriteLine("Received from client: " + buffer.ToString(Encoding.UTF8));
-            }            
-            context.WriteAsync(message);
+                response.MessageId = request.MessageId;
+                response.Result = "hello world";
+            }
+
+            context.WriteAsync(this.serializable.Serialize(message));
         }
 
         public override void ChannelReadComplete(IChannelHandlerContext context)

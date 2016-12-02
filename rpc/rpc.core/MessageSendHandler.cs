@@ -37,10 +37,11 @@ namespace rpc.core
             var byteBuffer = message as IByteBuffer;
             if (byteBuffer != null)
             {
-                var messageId = byteBuffer.ToString(Encoding.UTF8);
-                MessageSendCallBack callBack = callBackActions[messageId];
+                var response = (MessageResponse)this.serializer.Deserialize(byteBuffer.ToArray());
+              
+                MessageSendCallBack callBack = this.callBackActions[response.MessageId];
                 callBack.Over(new MessageResponse());
-                Console.WriteLine("Received from server: " + messageId);
+                Console.WriteLine("Received from server: " + response.MessageId);
 
             }  
         }
